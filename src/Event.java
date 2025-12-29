@@ -1,13 +1,16 @@
+import java.util.ArrayList;
+import java.util.Objects;
+
 public class Event {
     private String title;
-    private String date;       // для простоты String, можно было LocalDate
-    private String time;       // тоже String
+    private String date;   // формат "YYYY-MM-DD"
+    private String time;   // формат "HH:MM"
     private String location;
     private Organizer organizer;
-    private int maxParticipants;
-    private int currentParticipants;
 
-    // Конструктор
+    private int maxParticipants;
+    private final ArrayList<Participant> participants;
+
     public Event(String title, String date, String time, String location,
                  Organizer organizer, int maxParticipants) {
         this.title = title;
@@ -16,101 +19,94 @@ public class Event {
         this.location = location;
         this.organizer = organizer;
         this.maxParticipants = maxParticipants;
-        this.currentParticipants = 0;
+        this.participants = new ArrayList<>();
     }
 
-    // Getters и Setters
-    public String getTitle() {
-        return title;
+    // Getters / Setters (абстракция + инкапсуляция)
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDate() { return date; }
+    public void setDate(String date) { this.date = date; }
+
+    public String getTime() { return time; }
+    public void setTime(String time) { this.time = time; }
+
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+
+    public Organizer getOrganizer() { return organizer; }
+    public void setOrganizer(Organizer organizer) { this.organizer = organizer; }
+
+    public int getMaxParticipants() { return maxParticipants; }
+    public void setMaxParticipants(int maxParticipants) { this.maxParticipants = maxParticipants; }
+
+    public int getCurrentParticipants() { return participants.size(); }
+
+    public int seatsLeft() {
+        return maxParticipants - participants.size();
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public Organizer getOrganizer() {
-        return organizer;
-    }
-
-    public void setOrganizer(Organizer organizer) {
-        this.organizer = organizer;
-    }
-
-    public int getMaxParticipants() {
-        return maxParticipants;
-    }
-
-    public void setMaxParticipants(int maxParticipants) {
-        this.maxParticipants = maxParticipants;
-    }
-
-    public int getCurrentParticipants() {
-        return currentParticipants;
-    }
-
-    // Методы логики
-
-    // Добавить участника (только считает количество, без списка для простоты)
-    public boolean registerParticipant(Participant participant) {
-        if (isFull()) {
-            System.out.println("Event is full, cannot register: " + participant.getName());
-            return false;
-        }
-        currentParticipants++;
-        System.out.println("Registered participant: " + participant.getName());
-        return true;
-    }
-
-    // Проверка, заполнено ли событие
     public boolean isFull() {
-        return currentParticipants >= maxParticipants;
+        return participants.size() >= maxParticipants;
     }
 
-    // Перенести событие на другую дату/время
     public void reschedule(String newDate, String newTime) {
         this.date = newDate;
         this.time = newTime;
     }
 
-    // Краткая информация о событии
-    public String getInfo() {
+    // Регистрация с защитой от дублей по email (equals у Participant по email из Person)
+    public boolean registerParticipant(Participant participant) {
+        if (participant == null) return false;
+
+        if (isFull()) {
+            System.out.println("Event is full. Cannot register: " + participant.getEmail());
+            return false;
+        }
+
+        if (participants.contains(participant)) {
+            System.out.println("Already registered: " + participant.getEmail());
+            return false;
+        }
+
+        participants.add(participant);
+        System.out.println("Registered: " + participant.getName() + " -> " + title);
+        return true;
+    }
+
+    public void showParticipants() {
+        System.out.println("Participants of '" + title + "':");
+        if (participants.isEmpty()) {
+            System.out.println("  none yet");
+            return;
+        }
+        for (Participant p : participants) {
+            System.out.println("  - " + p);
+        }
+    }
+
+    @Override
+    public String toString() {
         return "Event{title='" + title + "', date='" + date + "', time='" + time +
                 "', location='" + location + "', organizer='" +
-                (organizer != null ? organizer.getName() : "N/A") + "', " +
-                "participants=" + currentParticipants + "/" + maxParticipants + "}";
+                (organizer != null ? organizer.getName() : "N/A") + "', seatsLeft=" + seatsLeft() + "}";
     }
 
-    // Сравнение двух событий по количеству свободных мест
-    public int freeSeats() {
-        return maxParticipants - currentParticipants;
+    // equals/hashCode для Event: уникальность по title+date+time+location
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Event)) return false;
+        Event event = (Event) o;
+        return Objects.equals(title, event.title)
+                && Objects.equals(date, event.date)
+                && Objects.equals(time, event.time)
+                && Objects.equals(location, event.location);
     }
 
-    public boolean hasMoreFreeSeatsThan(Event other) {
-        if (other == null) return false;
-        return this.freeSeats() > other.freeSeats();
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, date, time, location);
     }
 }

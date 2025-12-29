@@ -1,26 +1,14 @@
-public class Organizer {
-    private String name;
+public class Organizer extends Person {
     private String organizationName;
-    private String contactEmail;
 
-    // Конструктор
     public Organizer(String name, String organizationName, String contactEmail) {
-        this.name = name;
+        super(name, contactEmail);
         this.organizationName = organizationName;
-        this.contactEmail = contactEmail;
     }
 
-    public String getInfo() {
-        return name + " | " + organization + " | " + contactEmail;
-    },
-
-    // Getters и Setters
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    @Override
+    public String getRole() {
+        return "Organizer";
     }
 
     public String getOrganizationName() {
@@ -31,18 +19,8 @@ public class Organizer {
         this.organizationName = organizationName;
     }
 
-    public String getContactEmail() {
-        return contactEmail;
-    }
-
-    public void setContactEmail(String contactEmail) {
-        this.contactEmail = contactEmail;
-    }
-
-    // Метод для краткой информации
-    public String getInfo() {
-        return "Organizer{name='" + name + "', org='" + organizationName
-                + "', email='" + contactEmail + "'}";
+    @Override
+    public String toString() {
+        return "Organizer{name='" + getName() + "', org='" + organizationName + "', email='" + getEmail() + "'}";
     }
 }
-

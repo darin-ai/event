@@ -11,6 +11,31 @@ public class Main {
         Event event2 = new Event("Hackathon", "2025-04-20", "10:00", "Main Hall", organizer2, 5);
         Event event3 = new Event("Design Meetup", "2025-02-15", "18:30", "Main Hall", organizer1, 1);
 
+        try {
+            OrganizerDAO orgDao = new OrganizerDAO();
+            EventDAO eventDao = new EventDAO();
+
+            // CREATE
+            int orgId = orgDao.create(organizer1);
+            int eventId = eventDao.create(event1, orgId);
+
+            // READ
+            orgDao.readAll();
+            eventDao.readAll();
+
+            // UPDATE
+            eventDao.updateLocation(eventId, "Room C101");
+
+            // DELETE (чтобы показать удаление)
+            // eventDao.delete(eventId);
+            // orgDao.delete(orgId);
+
+            System.out.println("CRUD DONE ✅");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         Participant p1 = new Participant("Arman", "arman@example.com", "+7 701 000 00 01");
         Participant p2 = new Participant("Dana", "dana@example.com", "+7 702 000 00 02");
         Participant p3 = new Participant("Arman 2", "arman@example.com", "+7 703 000 00 03"); // тот же email -> equals true

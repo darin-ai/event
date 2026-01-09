@@ -6,6 +6,12 @@ public class Organizer extends Person {
         this.organizationName = organizationName;
     }
 
+    private Integer id;
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
+
     @Override
     public String getRole() {
         return "Organizer";
